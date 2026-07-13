@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Manual de Arquitectura MVC - Manadas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { color: #4a2b8e; border-bottom: 2px solid #4a2b8e; padding-bottom: 10px; }
+        h2 { color: #17a2b8; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        h3 { color: #333; }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .faq-box {
+            background-color: #fdfdfd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .faq-q { font-weight: bold; color: #d39e00; margin-bottom: 5px; }
+        .faq-a { margin: 0; font-style: italic; color: #555; }
+        
+        @media print {
+            body { padding: 0; max-width: 100%; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print" style="background-color:#d4edda; color:#155724; padding:15px; text-align:center; border-radius:5px; margin-bottom:30px; font-weight:bold;">
+        💡 Para guardar como PDF: Haz clic en "Destino" y elige "Guardar como PDF".
+    </div>
+
+    <h1>Manual de Arquitectura MVC: Proyecto Manadas</h1>
+    <p>Este documento es tu <strong>guía de estudio definitiva</strong> para defender tu proyecto final. Aquí encontrarás cómo está estructurado el código, dónde está cada cosa y cómo responder a las preguntas más comunes de los profesores.</p>
+
+    <h2>1. Concepto General: Arquitectura MVC</h2>
+    <p>Tu proyecto está construido utilizando el <strong>Patrón de Diseño MVC (Modelo-Vista-Controlador)</strong>. Esto significa que el código está separado en tres capas distintas para que sea ordenado, seguro y escalable.</p>
+    <ul>
+        <li><strong>M (Modelos):</strong> Son los únicos archivos que hablan con la Base de Datos (MySQL). Si hay un <code>SELECT</code>, <code>INSERT</code> o <code>UPDATE</code>, está aquí.</li>
+        <li><strong>V (Vistas):</strong> Son los archivos HTML/PHP que el usuario ve en la pantalla. No tienen lógica compleja, solo dibujan tablas y formularios.</li>
+        <li><strong>C (Controladores):</strong> Es el "cerebro". Recibe lo que el usuario hace (clics), le pide información al Modelo y decide qué Vista mostrar.</li>
+    </ul>
+
+    <h2>2. Mapa de Carpetas y Archivos</h2>
+    <p>Esta es la radiografía exacta de tu proyecto:</p>
+    <div class="code-block">Grupo6/
+├── config/                  <-- Configuraciones maestras
+│   ├── conexion.php         (Conecta PHP con MySQL)
+│   ├── config.php           (Define la constante BASE_URL)
+│   └── sesion.php           (Controla quién está logueado)
+│
+├── controllers/             <-- Los "Cerebros" de la aplicación
+│   ├── AdminController.php  (Lógica del panel del administrador)
+│   ├── AuthController.php   (Lógica exclusiva de Iniciar/Cerrar sesión)
+│   ├── PaseadorController.php(Lógica del panel del operario)
+│   └── UsuarioController.php (Lógica del dueño de mascota)
+│
+├── models/                  <-- Los "Músculos" (Base de Datos)
+│   ├── AdminModel.php       (Trae todos los usuarios, paseadores, pedidos)
+│   ├── AuthModel.php        (Verifica si el email y la clave existen)
+│   ├── PaseadorModel.php    (Busca la agenda asignada y cambia estados)
+│   └── UsuarioModel.php     (Registra mascotas y pide nuevos paseos)
+│
+├── views/                   <-- "La Cara" visual del sistema (HTML/CSS)
+│   ├── admin/               (Pantallas exclusivas del Admin)
+│   ├── paseador/            (Pantallas exclusivas del Paseador)
+│   ├── usuario/             (Pantallas exclusivas del Dueño)
+│   └── partials/            (El header.php y footer.php que se repiten)
+│
+├── index.php                <-- Puerta principal (te redirige al Login)
+└── manadas.sql              <-- Copia de seguridad de la Base de Datos</div>
+
+    <h2>3. Flujos de Trabajo (Cómo funciona por dentro)</h2>
+    
+    <h3>A. Flujo de Login (Autenticación)</h3>
+    <ol>
+        <li>El usuario entra a <code>views/usuario/login.php</code> y pone su usuario/clave.</li>
+        <li>Al presionar "Ingresar", el formulario se envía por POST a <code>controllers/AuthController.php</code>.</li>
+        <li>El Controlador llama a <code>AuthModel->autenticarUsuario()</code>.</li>
+        <li>El Modelo busca en las 3 tablas. Si lo encuentra, devuelve un rol.</li>
+        <li>El Controlador guarda el rol en <code>$_SESSION</code> y redirige al panel correcto.</li>
+    </ol>
+
+    <h3>B. Flujo del Dueño (Ejemplo: Pedir Paseo)</h3>
+    <ol>
+        <li>El dueño entra a <code>UsuarioController.php?action=solicitar_paseo</code>.</li>
+        <li>Elige perro y paseador, y envía el formulario.</li>
+        <li>El Controlador llama a <code>UsuarioModel->solicitarPaseo()</code>.</li>
+        <li><strong>IMPORTANTE:</strong> Ese Modelo usa una <code>transacción</code> en MySQL. Inserta en la tabla <code>paseo</code> y luego en <code>pago</code>. Si falla, cancela todo.</li>
+    </ol>
+
+    <h2>4. Preguntas Frecuentes de Examen (Cheat Sheet)</h2>
+
+    <div class="faq-box">
+        <div class="faq-q">Pregunta 1: "¿Por qué dividiste el código en tantas carpetas?"</div>
+        <div class="faq-a">Respuesta: "Para aplicar el patrón MVC. Esto separa la lógica de base de datos (Modelos) del diseño visual (Vistas). Así, si mañana quiero cambiar los colores, no toco el código de la base de datos. Es el estándar de la industria."</div>
+    </div>
+
+    <div class="faq-box">
+        <div class="faq-q">Pregunta 2: "Muéstrame dónde te conectas a la Base de Datos"</div>
+        <div class="faq-a">Respuesta: "Está centralizado. Solo tienes que abrir config/conexion.php."</div>
+    </div>
+
+    <div class="faq-box">
+        <div class="faq-q">Pregunta 3: "¿Cómo evitas que un paseador entre al panel del administrador?"</div>
+        <div class="faq-a">Respuesta: "En la cabecera de cada Controlador, importo sesion.php y uso la función get_user_role(). Si el rol no coincide con el necesario, uso die() para bloquear el acceso."</div>
+    </div>
+
+    <div class="faq-box">
+        <div class="faq-q">Pregunta 4: "Muéstrame cómo traes los paseos para el administrador."</div>
+        <div class="faq-a">Respuesta: "Abro models/AdminModel.php en la función getPedidos(). Ahí tengo un SELECT con varios LEFT JOIN para unir las tablas de paseo, pago, mascota, usuarios y paseador."</div>
+    </div>
+
+    <div class="faq-box">
+        <div class="faq-q">Pregunta 5: "¿Cómo funciona el cierre de sesión?"</div>
+        <div class="faq-a">Respuesta: "Se envía la petición a AuthController.php?action=logout. Este llama a cerrarSesion() (que destruye las cookies usando session_destroy()) y redirige al login."</div>
+    </div>
+
+    <div class="faq-box">
+        <div class="faq-q">Pregunta 6: "¿Por qué en tu base de datos algunas variables están en sesión?"</div>
+        <div class="faq-a">Respuesta: "Usamos $_SESSION de PHP para mantener un estado ('state') en el servidor. Al loguearse, guardamos su user_id y rol. PHP almacena esto de forma segura en el servidor."</div>
+    </div>
+
+    <script>
+        // Al abrir el archivo en el navegador, lanzar la ventana de imprimir automáticamente
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

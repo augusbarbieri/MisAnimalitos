@@ -1,5 +1,0 @@
-﻿Project root: C:\xampp\htdocs\Grupo6
-Total files scanned: 36
-Total links found (candidate local links): 162
-Missing links: 0
-
