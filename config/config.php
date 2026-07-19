@@ -18,8 +18,8 @@ if (!defined('BASE_URL')) {
     $config_dir = str_replace('\\', '/', __DIR__);
     $document_root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
 
-    // 2. Comprobamos si estamos dentro de la ruta pública del servidor web
-    if (!empty($document_root) && strpos($config_dir, $document_root) === 0) {
+    // 2. Comprobamos si estamos dentro de la ruta pública del servidor web (usamos stripos para no tener problemas en Windows)
+    if (!empty($document_root) && stripos($config_dir, $document_root) === 0) {
         
         // Extraemos la porción de la URL que corresponde a nuestro proyecto
         $base_path = substr($config_dir, strlen($document_root));
@@ -29,7 +29,7 @@ if (!defined('BASE_URL')) {
         
         // 3. ¡MOMENTO CLAVE! Declaramos la Constante BASE_URL.
         // Las constantes (en mayúsculas) se pueden usar en cualquier archivo PHP sin importar.
-        // Ejemplo de uso: <a href="<?php echo BASE_URL; ?>views/login.php">
+        // Ejemplo de uso: <a href="< ?php echo BASE_URL; ? >views/login.php">
         define('BASE_URL', rtrim($base_url, '/') . '/');
     } else {
         // Plan B: Si la lógica de arriba falla (ej. en servidores raros), caemos en la raíz simple '/'
