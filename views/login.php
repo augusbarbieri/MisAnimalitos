@@ -40,8 +40,14 @@ require_once __DIR__ . '/partials/header.php';
                 redirige a "login.php?error=credenciales_invalidas".
                 Aquí capturamos ese "?error" de la URL y mostramos un texto rojo.
                 -->
+                <?php if (isset($_GET['msg']) && $_GET['msg'] === 'registrado'): ?>
+                    <div style="color: var(--success); background-color: var(--success-bg); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: 500; border-left: 4px solid var(--success); font-size: 0.9em;">
+                        ¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.
+                    </div>
+                <?php endif; ?>
+
                 <?php if (isset($_GET['error'])): ?>
-                    <div style="color: red; margin-bottom: 10px;">
+                    <div style="color: var(--danger); background-color: var(--danger-bg); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: 500; border-left: 4px solid var(--danger); font-size: 0.9em;">
                         <?php 
                         if ($_GET['error'] === 'campos_vacios') echo "Por favor, complete todos los campos.";
                         elseif ($_GET['error'] === 'credenciales_invalidas') echo "Email o contraseña incorrectos.";
@@ -69,8 +75,8 @@ require_once __DIR__ . '/partials/header.php';
                     <button type="submit" class="btn-login">Ingresar</button>
                 </form>
 
-                <p class="signup-link">
-                    ¿Aún no tienes cuenta? <a href="registro.php">Crea una cuenta</a>
+                <p style="text-align: center; margin-top: 20px; font-size: 0.95rem; color: var(--text-muted);">
+                    ¿Aún no tienes cuenta? <a href="registro.php" style="color: var(--primary); font-weight: 600; text-decoration: none;">Crea una cuenta</a>
                 </p>
             </div>
         </div>

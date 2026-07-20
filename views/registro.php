@@ -1,50 +1,90 @@
 <?php
-require_once __DIR__ . '/../php/config.php'; // Defines BASE_URL
-include_once __DIR__ . '/../componentes/header.php';
+/**
+ * =========================================================================
+ * ARCHIVO: views/registro.php
+ * =========================================================================
+ * PROPÓSITO: Formulario de registro para nuevos clientes (dueños de mascotas).
+ * (De baja complejidad, sin frameworks y utilizando estilos nativos).
+ * =========================================================================
+ */
+$tituloPagina = "Crear Cuenta - Manadas";
+$bodyClass = "login-page"; // Reusamos el fondo estético de la pantalla de login
+require_once __DIR__ . '/partials/header.php';
 ?>
 
-<div class="form-container">
-    <div class="form-card">
-        <h3>Registro</h3>
-        <form action="<?php echo BASE_URL; ?>php/register.php" method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingresá tu nombre" required>
+<div class="login-container">
+    <!-- Panel Izquierdo: Decorativo con mensaje de bienvenida -->
+    <div class="login-info-panel">
+        <div class="login-info-content">
+            <h2>Únete a nuestra manada hoy mismo.</h2>
+            <p>Registra tu cuenta de dueño para comenzar a solicitar paseos para tus mejores amigos.</p>
+        </div>
+    </div>
+
+    <!-- Panel Derecho: Formulario interactivo -->
+    <div class="login-form-panel" style="padding: 20px 40px; overflow-y: auto;">
+        <div class="login-form-content" style="max-width: 450px;">
+            <div class="login-logo" style="margin-bottom: 5px; text-align: center;">
+                <i class="fas fa-paw"></i>
             </div>
-            <div class="mb-3">
-                <label for="apellido" class="form-label">Apellido</label>
-                <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingresá tu apellido" required>
-            </div>
-            <div class="mb-3">
-                <label for="direccion" class="form-label">Dirección</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Ingresá tu dirección" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Ingresá tu correo" required>
-            </div>
-            <div class="mb-3">
-                <label for="telefono" class="form-label">Teléfono</label>
-                <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ingresá tu teléfono" required>
-            </div>
-            <div class="mb-3">
-                <label for="img" class="form-label">Foto de Perfil (Opcional)</label>
-                <input type="file" class="form-control" id="img" name="img" accept="image/*">
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Ingresá tu contraseña" required>
-            </div>
-            <div class="mb-3">
-                <label for="confirmar" class="form-label">Confirmar Contraseña</label>
-                <input type="password" class="form-control" id="confirmar" name="password_r" placeholder="Repetí tu contraseña" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Registrarme</button>
-            <p class="text-center mt-3">
-                ¿Ya tenés cuenta? <a href="<?php echo BASE_URL; ?>paginas/inicio-sesion.php">Iniciar sesión</a>
+            <h3 style="margin-top: 0; text-align: center;">Crea tu Cuenta</h3>
+            <p class="subtitle" style="text-align: center; margin-bottom: 20px; color: var(--text-muted);">Completá tus datos de contacto</p>
+
+            <!-- Sistema de Errores capturados de la URL -->
+            <?php if (isset($_GET['error'])): ?>
+                <div style="color: var(--danger); background-color: var(--danger-bg); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: 500; font-size: 0.9em; border-left: 4px solid var(--danger);">
+                    <?php 
+                    if ($_GET['error'] === 'campos_vacios') echo "Por favor, completa todos los campos obligatorios.";
+                    elseif ($_GET['error'] === 'email_existente') echo "El correo ingresado ya se encuentra registrado.";
+                    elseif ($_GET['error'] === 'error_db') echo "Hubo un problema al guardar tus datos. Inténtalo de nuevo.";
+                    else echo "Ha ocurrido un error.";
+                    ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Formulario de envío por POST a AuthController.php -->
+            <form action="<?php echo BASE_URL; ?>controllers/AuthController.php?action=register" method="POST">
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label for="nombre" style="display: block; margin-bottom: 5px; font-weight: 500;">Nombre</label>
+                        <input type="text" name="nombre" id="nombre" placeholder="Nombre" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit;">
+                    </div>
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label for="apellido" style="display: block; margin-bottom: 5px; font-weight: 500;">Apellido</label>
+                        <input type="text" name="apellido" id="apellido" placeholder="Apellido" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="email" style="display: block; margin-bottom: 5px; font-weight: 500;">Correo Electrónico</label>
+                    <input type="email" name="email" id="email" placeholder="ejemplo@correo.com" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="password" style="display: block; margin-bottom: 5px; font-weight: 500;">Contraseña</label>
+                    <input type="password" name="password" id="password" placeholder="Ingresá una contraseña" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="telefono" style="display: block; margin-bottom: 5px; font-weight: 500;">Teléfono de Contacto</label>
+                    <input type="tel" name="telefono" id="telefono" placeholder="Ej: 1135975802" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="direccion" style="display: block; margin-bottom: 5px; font-weight: 500;">Dirección Residencial</label>
+                    <input type="text" name="direccion" id="direccion" placeholder="Ej: Av. Rivadavia 1234" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit;">
+                </div>
+
+                <button type="submit" class="btn-login" style="width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-size: 1rem; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit;">Registrarme</button>
+            </form>
+
+            <p style="text-align: center; margin-top: 20px; font-size: 0.95rem; color: var(--text-muted);">
+                ¿Ya tenés cuenta? <a href="login.php" style="color: var(--primary); font-weight: 600; text-decoration: none;">Iniciar sesión</a>
             </p>
-        </form>
+        </div>
     </div>
 </div>
 
-<?php include_once __DIR__ . '/../componentes/footer.php'; ?>
+<?php
+require_once __DIR__ . '/partials/footer.php';
+?>

@@ -11,6 +11,7 @@
 
 // Traemos la configuración para poder usar la constante BASE_URL en los links CSS
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/sesion.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">

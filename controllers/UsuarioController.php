@@ -20,8 +20,6 @@ if (get_user_role() !== 'usuario') {
 
 $action = $_GET['action'] ?? 'inicio';
 
-// Instanciamos el Modelo para obtener los datos de la BD
-$usuarioModel = new UsuarioModel();
 // Obtenemos el ID del dueño que está navegando (desde la sesión)
 $id_dueno = $_SESSION['user_id'];
 
@@ -33,7 +31,7 @@ switch ($action) {
 
     // CASO: Ver lista de mascotas
     case 'mascotas':
-        $mascotas = $usuarioModel->getMascotas($id_dueno);
+        $mascotas = getMascotas($id_dueno);
         require_once __DIR__ . '/../views/usuario/mascotas.php';
         break;
 
@@ -52,7 +50,7 @@ switch ($action) {
                 'observaciones' => $_POST['observaciones'] ?? ''
             ];
             
-            if ($usuarioModel->crearMascota($data)) {
+            if (crearMascota($data)) {
                 // Si guardó, redireccionar a la lista de mascotas
                 header("Location: " . BASE_URL . "controllers/UsuarioController.php?action=mascotas&msg=creada");
             } else {
@@ -70,15 +68,15 @@ switch ($action) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Acción POST: Formulario enviado
             $data = [
-                'id_mascota' => $_POST['id_mascota'] ?? 0,
-                'id_paseador' => $_POST['id_paseador'] ?? 0,
+                'id_mascota' => (int)($_POST['id_mascota'] ?? 0),
+                'id_paseador' => (int)($_POST['id_paseador'] ?? 0),
                 'fecha' => $_POST['fecha'] ?? '',
                 'hora_inicio' => $_POST['hora_inicio'] ?? '',
                 'tipo_paseo' => $_POST['tipo_paseo'] ?? 'individual'
             ];
             
             // Llama al modelo para guardar la solicitud (creará Paseo y Pago)
-            if ($usuarioModel->solicitarPaseo($data)) {
+            if (solicitarPaseo($data)) {
                 header("Location: " . BASE_URL . "controllers/UsuarioController.php?action=mis_paseos&msg=solicitado");
             } else {
                 header("Location: " . BASE_URL . "controllers/UsuarioController.php?action=pedir_paseo&error=1");
@@ -87,15 +85,15 @@ switch ($action) {
         } else {
             // Acción GET: Cargar el formulario
             // Necesitamos pasarle al formulario qué mascotas tiene y qué paseadores existen
-            $mascotas = $usuarioModel->getMascotas($id_dueno);
-            $paseadores = $usuarioModel->getPaseadoresActivos();
+            $mascotas = getMascotas($id_dueno);
+            $paseadores = getPaseadoresActivos();
             require_once __DIR__ . '/../views/usuario/pedir_paseo.php';
         }
         break;
 
     // CASO: Ver el historial de paseos
     case 'mis_paseos':
-        $paseos = $usuarioModel->getMisPaseos($id_dueno);
+        $paseos = getMisPaseos($id_dueno);
         require_once __DIR__ . '/../views/usuario/mis_paseos.php';
         break;
 
@@ -103,6 +101,4 @@ switch ($action) {
         require_once __DIR__ . '/../views/usuario/inicio.php';
         break;
 }
-
-$usuarioModel->cerrarConexion();
 ?>

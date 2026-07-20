@@ -32,17 +32,14 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 3. Hablamos con el Modelo (Base de Datos)
-    $authModel = new AuthModel();
     // Le decimos: "¿Existe alguien con este email y esta password?"
-    $resultadoAuth = $authModel->autenticarUsuario($email, $password);
+    $resultadoAuth = autenticarUsuario($email, $password);
     
     // 4. Si el modelo nos devolvió datos... ¡El login fue un Éxito!
     if ($resultadoAuth) {
         $usuario_autenticado = $resultadoAuth['datos']; // Array con datos del usuario
         $rol = $resultadoAuth['rol'];                   // Qué es: 'admin', 'usuario', 'paseador'
         $id_col = $resultadoAuth['id_col'];             // Cómo se llama la columna de su ID
-        
-        $authModel->cerrarConexion();
 
         // 5. Preparamos las variables para guardarlas en la "memoria" (Sesión)
         $id_usuario = $usuario_autenticado[$id_col];
@@ -72,12 +69,42 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         
     } else {
         // 8. LOGIN FALLIDO: Las contraseñas no coinciden o no existe el email
-        $authModel->cerrarConexion();
         header("Location: " . BASE_URL . "views/login.php?error=credenciales_invalidas");
         exit();
     }
     
-// 9. CASO: LOGOUT (Cerrar Sesión)
+// 9. CASO: REGISTRO (Guardar datos en BD)
+} else if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = [
+        'nombre' => trim($_POST['nombre'] ?? ''),
+        'apellido' => trim($_POST['apellido'] ?? ''),
+        'email' => trim($_POST['email'] ?? ''),
+        'password' => $_POST['password'] ?? '',
+        'telefono' => trim($_POST['telefono'] ?? ''),
+        'direccion' => trim($_POST['direccion'] ?? '')
+    ];
+
+    // Validación básica simplificada
+    if ($data['nombre'] === '' || $data['apellido'] === '' || $data['email'] === '' || $data['password'] === '') {
+        header("Location: " . BASE_URL . "views/registro.php?error=campos_vacios");
+        exit();
+    }
+
+    // Verificar si el correo ya existe
+    if (emailExiste($data['email'])) {
+        header("Location: " . BASE_URL . "views/registro.php?error=email_existente");
+        exit();
+    }
+
+    // Registrar al cliente
+    if (registrarCliente($data)) {
+        header("Location: " . BASE_URL . "views/login.php?msg=registrado");
+    } else {
+        header("Location: " . BASE_URL . "views/registro.php?error=error_db");
+    }
+    exit();
+
+// 10. CASO: LOGOUT (Cerrar Sesión)
 } else if ($action === 'logout') {
     cerrarSesion(); // Esta función (en sesion.php) ya destruye todo y redirige al login
     exit();

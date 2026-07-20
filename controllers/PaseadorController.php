@@ -21,34 +21,43 @@ if (get_user_role() !== 'paseador') {
 
 $action = $_GET['action'] ?? 'inicio';
 
-// Instanciamos el Modelo para obtener los datos de la BD
-$paseadorModel = new PaseadorModel();
 // Obtenemos el ID del paseador que está navegando (desde la sesión)
 $id_paseador = $_SESSION['user_id'];
 
 switch ($action) {
     // CASO: Pantalla inicial (Dashboard del Paseador)
     case 'inicio':
+        $paseos = getMiAgenda($id_paseador);
+        $totalPaseos = count($paseos);
+        $pendientes = 0;
+        $en_curso = 0;
+        foreach ($paseos as $p) {
+            if ($p['estado_paseo'] === 'no_iniciado') {
+                $pendientes++;
+            } elseif ($p['estado_paseo'] === 'en_curso') {
+                $en_curso++;
+            }
+        }
         require_once __DIR__ . '/../views/paseador/inicio.php';
         break;
 
     // CASO: Ver los paseos que tiene asignados
     case 'agenda':
         // Le pedimos al modelo solo los paseos de ESTE paseador en particular
-        $paseos = $paseadorModel->getMiAgenda($id_paseador);
+        $paseos = getMiAgenda($id_paseador);
         require_once __DIR__ . '/../views/paseador/agenda.php';
         break;
 
     // CASO: El paseador presiona "Comenzar Paseo" o "Finalizar Paseo"
     case 'cambiar_estado':
-        $id_paseo = $_GET['id_paseo'] ?? 0;
+        $id_paseo = (int)($_GET['id_paseo'] ?? 0);
         $nuevo_estado = $_GET['estado'] ?? ''; // 'en_curso' o 'finalizado'
         
         // 1. Validar que no nos inyecten estados falsos por URL
         if (in_array($nuevo_estado, ['en_curso', 'finalizado'])) {
             
             // 2. Le pedimos al modelo que haga el UPDATE en la Base de Datos
-            if ($paseadorModel->actualizarEstadoPaseo($id_paseo, $id_paseador, $nuevo_estado)) {
+            if (actualizarEstadoPaseo($id_paseo, $id_paseador, $nuevo_estado)) {
                 // Si funcionó, recargamos la agenda mostrando un mensaje verde de éxito
                 header("Location: " . BASE_URL . "controllers/PaseadorController.php?action=agenda&msg=estado_actualizado");
                 exit();
@@ -64,6 +73,4 @@ switch ($action) {
         require_once __DIR__ . '/../views/paseador/inicio.php';
         break;
 }
-
-$paseadorModel->cerrarConexion();
 ?>

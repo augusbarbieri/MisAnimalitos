@@ -4,22 +4,54 @@
  * VISTA: views/paseador/inicio.php
  * =========================================================================
  * PROPÓSITO: El menú principal para los empleados (Paseadores). 
- * Es muy sencillo porque su único trabajo es revisar su agenda.
+ * Muestra el resumen de sus paseos asignados.
  * =========================================================================
  */
 $tituloPagina = "Panel del Paseador";
 require_once __DIR__ . '/../partials/header.php';
 ?>
 
-<div class="container" style="padding: 20px;">
-    <h1>Panel del Paseador</h1>
-    <p>¡Hola, <?php echo $_SESSION['user_name']; ?>! Listo para un día de paseos?</p>
-    
-    <div style="display: flex; gap: 20px; margin-top: 20px;">
-        <a href="<?php echo BASE_URL; ?>controllers/PaseadorController.php?action=agenda" class="btn-login" style="text-decoration:none; text-align:center; display:inline-block; padding:10px; background-color:#17a2b8;">Ver Mi Agenda</a>
+<!-- Sección Héroe (Banner superior) -->
+<div class="hero-contained" style="margin-bottom: 20px;">
+    <h1>Panel de Control</h1>
+    <!-- Usamos htmlspecialchars para evitar ataques XSS -->
+    <p>¡Hola, <?php echo htmlspecialchars($_SESSION['user_name']); ?>! Listo para un día de paseos?</p>
+</div>
+
+<div class="container">
+    <!-- Grid CSS para acomodar las tarjetas una al lado de otra -->
+    <div class="dashboard-cards">
         
-        <!-- Reutilizamos el AuthController para cerrar sesión sin importar el tipo de usuario -->
-        <a href="<?php echo BASE_URL; ?>controllers/AuthController.php?action=logout" class="btn-login" style="text-decoration:none; text-align:center; display:inline-block; padding:10px; background-color:#dc3545;">Cerrar Sesión</a>
+        <!-- Tarjeta 1: Paseos Pendientes -->
+        <div class="dashboard-card">
+            <h2>Paseos Pendientes</h2>
+            <p>Servicios aprobados para comenzar</p>
+            <div class="dashboard-card-count" style="background: linear-gradient(135deg, var(--info) 0%, #2563EB 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <?php echo $pendientes ?? 0; ?>
+            </div>
+            <a href="<?php echo BASE_URL; ?>controllers/PaseadorController.php?action=agenda" class="btn-dashboard-card">Ver Mi Agenda</a>
+        </div>
+
+        <!-- Tarjeta 2: Paseos En Curso -->
+        <div class="dashboard-card">
+            <h2>En Curso</h2>
+            <p>Paseos que estás realizando ahora</p>
+            <div class="dashboard-card-count" style="background: linear-gradient(135deg, var(--warning) 0%, #EA580C 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <?php echo $en_curso ?? 0; ?>
+            </div>
+            <a href="<?php echo BASE_URL; ?>controllers/PaseadorController.php?action=agenda" class="btn-dashboard-card">Ir a la Agenda</a>
+        </div>
+
+        <!-- Tarjeta 3: Total del Día -->
+        <div class="dashboard-card">
+            <h2>Agenda Total</h2>
+            <p>Total de paseos asignados hoy</p>
+            <div class="dashboard-card-count">
+                <?php echo $totalPaseos ?? 0; ?>
+            </div>
+            <a href="<?php echo BASE_URL; ?>controllers/AuthController.php?action=logout" class="btn-dashboard-card" style="background: linear-gradient(135deg, var(--danger) 0%, #B91C1C 100%); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">Cerrar Sesión</a>
+        </div>
+
     </div>
 </div>
 

@@ -27,9 +27,6 @@ if (get_user_role() !== 'admin') {
 // Si no hay acción en la URL, asumimos que quiere ir al 'inicio' (Dashboard)
 $action = $_GET['action'] ?? 'inicio';
 
-// Instanciamos el modelo que sabe cómo hablar con la BD para cosas de admin
-$adminModel = new AdminModel();
-
 // 4. EL CEREBRO DEL CONTROLADOR (Switch)
 // Dependiendo de la acción, hacemos una cosa u otra
 switch ($action) {
@@ -37,9 +34,9 @@ switch ($action) {
     // CASO: Cargar el Dashboard principal
     case 'inicio':
         // Pedimos datos estadísticos al modelo usando count()
-        $totalUsuarios = count($adminModel->getUsuarios());
-        $totalPaseadores = count($adminModel->getPaseadores());
-        $pedidos = $adminModel->getPedidos();
+        $totalUsuarios = count(getUsuarios());
+        $totalPaseadores = count(getPaseadores());
+        $pedidos = getPedidos();
         $totalPedidos = count($pedidos);
         $pendientes = 0;
         
@@ -55,14 +52,14 @@ switch ($action) {
     // CASO: Ver lista de usuarios dueños de mascotas
     case 'usuarios':
         // 1. Pedimos los usuarios al modelo
-        $usuarios = $adminModel->getUsuarios();
+        $usuarios = getUsuarios();
         // 2. Cargamos la vista que dibuja la tabla
         require_once __DIR__ . '/../views/admin/usuarios.php';
         break;
 
     // CASO: Ver lista de paseadores
     case 'paseadores':
-        $paseadores = $adminModel->getPaseadores();
+        $paseadores = getPaseadores();
         require_once __DIR__ . '/../views/admin/paseadores.php';
         break;
 
@@ -83,7 +80,7 @@ switch ($action) {
             ];
             
             // Le pasamos el paquete de datos al modelo para que lo inserte
-            if ($adminModel->crearPaseador($data)) {
+            if (crearPaseador($data)) {
                 // Si fue exitoso, redireccionamos a la lista de paseadores
                 header("Location: " . BASE_URL . "controllers/AdminController.php?action=paseadores&msg=creado");
             } else {
@@ -101,19 +98,19 @@ switch ($action) {
 
     // CASO: Ver todos los pedidos y paseos del sistema
     case 'pedidos':
-        $pedidos = $adminModel->getPedidos();
+        $pedidos = getPedidos();
         require_once __DIR__ . '/../views/admin/pedidos.php';
         break;
 
     // CASO: Acción del admin cuando presiona el botón "Confirmar Pago"
     case 'confirmar_pago':
-        $id_pago = $_GET['id_pago'] ?? 0;
-        $id_paseo = $_GET['id_paseo'] ?? 0;
+        $id_pago = (int)($_GET['id_pago'] ?? 0);
+        $id_paseo = (int)($_GET['id_paseo'] ?? 0);
         
         // Si nos llegaron los dos IDs correctamente
         if ($id_pago && $id_paseo) {
             // Le ordenamos al modelo que modifique el estado en la base de datos
-            $adminModel->confirmarPago($id_pago, $id_paseo);
+            confirmarPago($id_pago, $id_paseo);
         }
         
         // Volvemos a la lista de pedidos para ver el cambio reflejado
@@ -125,7 +122,4 @@ switch ($action) {
         require_once __DIR__ . '/../views/admin/inicio.php';
         break;
 }
-
-// 5. LIMPIEZA: Cerramos la conexión a la base de datos al terminar
-$adminModel->cerrarConexion();
 ?>
