@@ -1,0 +1,39 @@
+¡Excelente pregunta! Estás utilizando una de las arquitecturas más famosas en el desarrollo de software llamada **MVC (Modelo - Vista - Controlador)**, con el añadido de una carpeta de configuración.
+
+Te explico cada una de estas carpetas con una metáfora para que quede clarísimo: imagina que tu aplicación web es **un restaurante**.
+
+### 1. ⚙️ Carpeta `config/` (La Administración del Restaurante)
+Esta carpeta guarda las reglas base y las herramientas indispensables para que el restaurante pueda abrir sus puertas. Aquí no hay lógica de negocio, solo configuraciones generales.
+* **`conexion.php`**: Es el "teléfono fijo" del restaurante. Tiene los datos exactos (usuario, contraseña, nombre de la base de datos) para llamar al servidor donde se guarda la información (MySQL).
+* **`sesion.php`**: Es el "sistema de reservas y clientes". Se encarga de recordar quién es el usuario que acaba de entrar, qué rol tiene (dueño, paseador o admin) y vigila que nadie entre sin permiso a áreas restringidas (`require_login()`).
+* **`config.php`**: Define variables globales (como `BASE_URL`) para que el sistema sepa en qué calle y número está el restaurante, y así no se rompan las rutas de las imágenes o archivos CSS.
+
+### 2. 🧠 Carpeta `controllers/` (Los Mozos / Recepcionistas)
+Los controladores son los intermediarios. Son la cara lógica de tu aplicación. 
+Cuando un cliente hace clic en un botón o llena un formulario, la petición llega siempre a un **Controlador**.
+* **Su trabajo es**: 
+  1. Recibir la orden del usuario (Ej: *"Quiero registrar un nuevo perro"*).
+  2. Verificar que los datos enviados (por el `$_POST`) no estén vacíos.
+  3. Ir a hablar con la cocina (`models/`) y decirle *"Che, guardame este perrito en la base de datos"*.
+  4. Agarrar la respuesta de la cocina y llevársela al cliente mostrando la pantalla adecuada (`views/`), o redireccionarlo a otra página.
+* *En tu código: tienes un recepcionista distinto según quién entre (`AdminController`, `PaseadorController`, `UsuarioController`, `AuthController`).*
+
+### 3. 💾 Carpeta `models/` (El Cocinero / La Cocina)
+Los modelos son los **únicos** autorizados a tocar la comida, es decir, a hablar directamente con la Base de Datos. Los modelos no saben nada sobre botones, colores, HTML o URLs; solo saben hacer consultas (SQL).
+* **Su trabajo es**:
+  1. Recibir el pedido del Controlador.
+  2. Armar la consulta SQL (`SELECT`, `INSERT`, `UPDATE`, `DELETE`).
+  3. Ejecutar la consulta de forma segura en la base de datos.
+  4. Devolverle la información (o un "Éxito/Fallo") de vuelta al Controlador.
+* *En tu código: Tienes funciones exclusivas como `crearMascota()`, `getMisPaseos()`, `actualizarEstadoPaseo()` que ejecutan las acciones en las tablas correspondientes.*
+
+---
+
+### Resumen del ciclo completo (Cómo se conectan):
+1. El usuario está en la **Vista** de solicitar paseo y presiona el botón "Confirmar".
+2. Los datos del formulario viajan por internet y llegan al **Controlador** (`UsuarioController.php?action=pedir_paseo`).
+3. El **Controlador** lee los datos, verifica que estén bien y llama al **Modelo** (`solicitarPaseo($datos)`).
+4. El **Modelo** usa las herramientas de la carpeta **Config** (`conexion.php`) para guardar la reserva en la Base de Datos y le avisa al controlador: *"¡Listo, guardado!"*
+5. El **Controlador** festeja y redirige al usuario a la **Vista** de sus paseos con un cartelito verde de éxito.
+
+¿Te queda claro cómo fluye la información entre estas carpetas?
