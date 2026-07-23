@@ -38,7 +38,32 @@ switch ($action) {
                 $en_curso++;
             }
         }
+        $perfil = getPaseadorPerfil($id_paseador);
         require_once __DIR__ . '/../views/paseador/inicio.php';
+        break;
+
+    // CASO: Ver y editar perfil del paseador
+    case 'perfil':
+        $perfil = getPaseadorPerfil($id_paseador);
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'telefono' => trim($_POST['telefono'] ?? ''),
+                'zona' => trim($_POST['zona'] ?? ''),
+                'disponibilidad' => !empty($_POST['disponibilidad']) ? $_POST['disponibilidad'] : null,
+                'bio' => trim($_POST['bio'] ?? '')
+            ];
+            
+            if (actualizarPaseadorPerfil($id_paseador, $data)) {
+                // Actualizar el nombre/imagen en la sesión por si cambiara (aunque en este caso no lo cambiamos, pero es buena práctica)
+                header("Location: " . BASE_URL . "controllers/PaseadorController.php?action=perfil&msg=perfil_actualizado");
+            } else {
+                header("Location: " . BASE_URL . "controllers/PaseadorController.php?action=perfil&error=1");
+            }
+            exit();
+        }
+        
+        require_once __DIR__ . '/../views/paseador/perfil.php';
         break;
 
     // CASO: Ver los paseos que tiene asignados

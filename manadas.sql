@@ -44,6 +44,7 @@ CREATE TABLE `admin` (
 LOCK TABLES `admin` WRITE;
 /*!40000 ALTER TABLE `admin` DISABLE KEYS */;
 INSERT INTO `admin` VALUES (1,'Augusto','Barbieri','barbieriaugusto@gmail.com','123456789','11354689','activo','2025-10-29 19:04:12',NULL);
+INSERT INTO `admin` VALUES (2,'Maria','Lopez','marialopez@gmail.com','123456789','11354689','activo','2025-10-29 19:04:12',NULL);
 /*!40000 ALTER TABLE `admin` ENABLE KEYS */;
 UNLOCK TABLES;
 

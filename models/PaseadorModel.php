@@ -63,4 +63,56 @@ function actualizarEstadoPaseo($id_paseo, $id_paseador, $nuevo_estado) {
     $conn->close();
     return $resultado;
 }
+
+/**
+ * Obtiene el perfil de un paseador por su ID.
+ */
+function getPaseadorPerfil($id_paseador) {
+    $conn = conectarBDManadas();
+    if (!$conn) {
+        die("Error de conexión a la base de datos.");
+    }
+
+    $id_paseador = (int)$id_paseador;
+    $sql = "SELECT id_paseador, nombre, apellido, email, telefono, zona, disponibilidad, estado, bio, fecha_alta, img 
+            FROM paseador 
+            WHERE id_paseador = $id_paseador 
+            LIMIT 1";
+            
+    $result = $conn->query($sql);
+    $perfil = null;
+    if ($result && $result->num_rows === 1) {
+        $perfil = $result->fetch_assoc();
+    }
+    
+    $conn->close();
+    return $perfil;
+}
+
+/**
+ * Actualiza los campos editables del perfil de un paseador.
+ */
+function actualizarPaseadorPerfil($id_paseador, $data) {
+    $conn = conectarBDManadas();
+    if (!$conn) {
+        die("Error de conexión a la base de datos.");
+    }
+
+    $id_paseador = (int)$id_paseador;
+    $telefono = $conn->real_escape_string($data['telefono']);
+    $zona = $conn->real_escape_string($data['zona']);
+    $disponibilidad = $data['disponibilidad'] ? "'" . $conn->real_escape_string($data['disponibilidad']) . "'" : "NULL";
+    $bio = $conn->real_escape_string($data['bio']);
+
+    $sql = "UPDATE paseador 
+            SET telefono = '$telefono', 
+                zona = '$zona', 
+                disponibilidad = $disponibilidad, 
+                bio = '$bio' 
+            WHERE id_paseador = $id_paseador";
+            
+    $resultado = $conn->query($sql);
+    $conn->close();
+    return $resultado;
+}
 ?>

@@ -42,7 +42,17 @@ require_once __DIR__ . '/../partials/header.php';
             <a href="<?php echo BASE_URL; ?>controllers/PaseadorController.php?action=agenda" class="btn-dashboard-card">Ir a la Agenda</a>
         </div>
 
-        <!-- Tarjeta 3: Total del Día -->
+        <!-- Tarjeta 3: Mi Perfil -->
+        <div class="dashboard-card">
+            <h2>Mi Perfil</h2>
+            <p>Ver y actualizar tus datos personales</p>
+            <div class="dashboard-card-count" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <i class="fas fa-user-cog" style="font-size: 0.8em;"></i>
+            </div>
+            <a href="<?php echo BASE_URL; ?>controllers/PaseadorController.php?action=perfil" class="btn-dashboard-card">Ver Mi Perfil</a>
+        </div>
+
+        <!-- Tarjeta 4: Total del Día -->
         <div class="dashboard-card">
             <h2>Agenda Total</h2>
             <p>Total de paseos asignados hoy</p>
